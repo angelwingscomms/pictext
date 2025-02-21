@@ -116,4 +116,3 @@ export const POST: RequestHandler = async ({ request, url }) => {
 		return new Response('Error processing images', { status: 500 });
 	}
 };
-```

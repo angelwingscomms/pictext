@@ -1,11 +1,9 @@
 <script>
-	let g = 'pictext';
-	$: localStorage.setItem('filename', g);
-	let loading = false;
-	let t = localStorage.getItem('t') || 5400;
-	$: localStorage.setItem('t', t);
-	let apiKey = localStorage.getItem('apiKey') || '';
+	import { onMount } from "svelte";
 
+	let g = 'pictext';
+	let loading = false;
+	let apiKey = '';
 
 	async function downloadData() {
 		loading = true;
@@ -20,7 +18,7 @@
 			formData.append('files', files[i]);
 		}
 
-		const response = await fetch(`/t?t=${t}&apiKey=${apiKey}`, {
+		const response = await fetch(`/t?apiKey=${apiKey}`, {
 			method: 'POST',
 			body: formData
 		});
@@ -42,12 +40,16 @@
 		document.body.removeChild(a);
 		loading = false;
 	}
+
+	onMount(() => {
+
+	});
+
 </script>
 
 <div class="bg-gray-900 p-4 text-white shadow-lg">
-	<input type="text" bind:value={g} class="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+	<input type="text" bind:value={g} placeholder="Filename (e.g., 'textresult')" class="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none" />
 	<input type="file" id="files" multiple />
-	<input type="number" bind:value={t} placeholder="Lower to speed up result, higher risk of hitting rate limit on free accounts (optional)" class="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none" />
 	<input type="text" bind:value={apiKey} placeholder="Gemini API key (optional)" class="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none" />
 	<button
 		on:click={downloadData}
