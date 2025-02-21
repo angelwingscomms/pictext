@@ -62,7 +62,7 @@ async function run(filePath: string) {
 }
 
 export const POST: RequestHandler = async ({ request, url }) => {
-  let waitTime = 9000;
+  let waitTime = 2700;
   const t = url.searchParams.get('t');
   if (t) {
     const parsedT = parseInt(t);
