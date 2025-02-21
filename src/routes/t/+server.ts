@@ -62,13 +62,20 @@ async function run(filePath: string) {
 }
 
 export const POST: RequestHandler = async ({ request, url }) => {
-		console.log('r', 'route')
+  let waitTime = 9000;
+  const t = url.searchParams.get('t');
+  if (t) {
+    const parsedT = parseInt(t);
+    if (parsedT) waitTime = parsedT * 1000
+  }
+
+	console.log('r', 'route')
 	const folderName = uuidv4();
 	console.log('e', folderName)
 
 	const folderPath = `./images/${folderName}`;
 
-		console.log('f', folderPath);
+	console.log('f', folderPath);
 	try {
 		await fsPromises.mkdir(folderPath, { recursive: true }); // Create directory if it doesn't exist
 
@@ -92,7 +99,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 				const text = await run(filePath);
 				console.log('run');
 				allText += `\n\n\n${text}`;
-				await new Promise((resolve) => setTimeout(resolve, 9000)); // Wait 9 seconds
+				await new Promise((resolve) => setTimeout(resolve, waitTime)); // Use waitTime
 			}
 		}
 
@@ -109,3 +116,4 @@ export const POST: RequestHandler = async ({ request, url }) => {
 		return new Response('Error processing images', { status: 500 });
 	}
 };
+```
