@@ -4,6 +4,7 @@ import { promises as fsPromises } from 'fs';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/server';
 import { G } from '$env/static/private';
+import { v4 as uuidv4 } from 'uuid';
 
 const genAI = new GoogleGenerativeAI(G);
 const fileManager = new GoogleAIFileManager(G);
@@ -61,16 +62,13 @@ async function run(filePath: string) {
 }
 
 export const POST: RequestHandler = async ({ request, url }) => {
-  console.log('r', 'route')
-	const folderName = url.searchParams.get('f');
+		console.log('r', 'route')
+	const folderName = uuidv4();
 	console.log('e', folderName)
-	if (!folderName) {
-		return new Response('No folder name provided', { status: 400 });
-	}
 
 	const folderPath = `./images/${folderName}`;
 
-  console.log('f', folderPath);
+		console.log('f', folderPath);
 	try {
 		await fsPromises.mkdir(folderPath, { recursive: true }); // Create directory if it doesn't exist
 
@@ -98,9 +96,16 @@ export const POST: RequestHandler = async ({ request, url }) => {
 			}
 		}
 
+		await fsPromises.rm(folderPath, { recursive: true }); // Delete the folder after processing
+
 		return new Response(allText);
 	} catch (error) {
 		console.error('Error processing images:', error);
+		try {
+			await fsPromises.rm(folderPath, { recursive: true, force: true }); //Attempt to delete folder on error
+		} catch (rmError) {
+			console.error('Error deleting folder:', rmError);
+		}
 		return new Response('Error processing images', { status: 500 });
 	}
 };
